@@ -19,6 +19,8 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
+              final scanListProvider = Provider.of<ScanListProvider>(context, listen: false);
+              scanListProvider.borrartodos();
             }, 
             icon: Icon(Icons.delete_forever_sharp)
           )
