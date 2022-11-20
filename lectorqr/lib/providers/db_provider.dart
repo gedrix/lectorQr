@@ -62,7 +62,6 @@ class DBProvider{
 
     //verificar la base de datos si existe
     final db = await database;
-    
     final res = await db?.rawInsert('''
       INSERT INTO Scans(id, tipo, valor) VALUES ($id, '$tipo','$valor')
     ''');
@@ -73,10 +72,67 @@ class DBProvider{
   //* forma 2 de realizar un insert usa el toJson defnido en el modelo 
   Future<int?>nuevoScan(ScanModel nuevoScan) async{
 
+    //RES ES EL ID DEL REGISTRO
     final db  = await database;
     final res = await db!.insert('Scans', nuevoScan.toJson());
 
-    print(res);
+    //print(res);
+    return res;
+  }
+
+  Future<ScanModel?>getScanById(int id)async{
+
+      final db = await database;
+
+      final res = await db!.query('Scans', where: 'id= ?', whereArgs: [id]);
+
+      return res.isNotEmpty ? ScanModel.fromJson(res.first) : null;
+  }
+
+
+  Future<List<ScanModel>?>getAllScans()async{
+
+      final db = await database;
+
+      final res = await db!.query('Scans');
+
+      return res.isNotEmpty ? res.map((e) => ScanModel.fromJson(e)).toList() : [];
+  }
+
+
+  Future<List<ScanModel>?>getScanTypo(String tipo)async{
+
+      final db = await database;
+
+      final res = await db!.rawQuery('''
+          SELECT * FROM Scans WHERE tipo = '$tipo'
+      ''');
+
+      return res.isNotEmpty ? res.map((e) => ScanModel.fromJson(e)).toList() : [];
+  }
+
+  Future<int?>updateScan(ScanModel nuevoScan) async{
+
+      final db = await database;
+
+      final res = await db!.update('Scans', nuevoScan.toJson(), where:'id=?', whereArgs: [nuevoScan.id]);
+
+      return res;
+  }
+
+  Future<int?>deleteScan(int id)async {
+
+    final db = await database;
+    final res = await db!.delete('Scan', where:'id=?', whereArgs: [id]);
+    return res;
+  }
+
+  Future<int?>deleteAllScan()async {
+
+    final db = await database;
+    final res = await db!.rawDelete('''
+    DELETE FROM Scans
+  ''');
     return res;
   }
 }
